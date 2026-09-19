@@ -20,7 +20,6 @@ import {
   Smartphone,
   Wallet,
   Coins,
-  CheckCircle2,
 } from "lucide-react";
 
 export default function CheckoutPage() {
@@ -138,7 +137,7 @@ export default function CheckoutPage() {
         origin: { y: 0.6 },
         colors: ["#00f59b", "#38bdf8", "#a855f7", "#ffffff"],
       });
-    } catch (e) {
+    } catch {
       // ignore
     }
 
@@ -383,7 +382,7 @@ export default function CheckoutPage() {
 
               {paymentMethod === "apple-pay" && (
                 <div className="p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-300 font-mono">
-                  Apple Pay biometric authentication will prompt once you click "Authorize Order".
+                  Apple Pay biometric authentication will prompt once you click &quot;Authorize Order&quot;.
                 </div>
               )}
 

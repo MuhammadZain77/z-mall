@@ -1,17 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import ProductCard from "@/components/product-card";
 import ProductFilter from "@/components/product-filter";
-import { useAppSelector } from "@/lib/redux/store";
-import { selectFilteredProducts } from "@/lib/redux/slices/productsSlice";
-import { Cpu, SlidersHorizontal, Sparkles } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/store";
+import {
+  selectFilteredProducts,
+  selectTotalProductsCount,
+  getProducts,
+  resetFilters,
+} from "@/lib/redux/slices/productsSlice";
+import { Cpu, Sparkles, RotateCcw } from "lucide-react";
 
 export default function ProductsPage() {
+  const dispatch = useAppDispatch();
   const filteredProducts = useAppSelector(selectFilteredProducts);
+  const totalProductsCount = useAppSelector(selectTotalProductsCount);
   const { isLoading, error, selectedCategory } = useAppSelector(
     (state) => state.products
   );
+
+  useEffect(() => {
+    if (totalProductsCount === 0 && !isLoading && !error) {
+      dispatch(getProducts());
+    }
+  }, [dispatch, totalProductsCount, isLoading, error]);
 
   const categoryTitles: Record<string, string> = {
     all: "Complete Hardware Catalog",
@@ -33,7 +46,9 @@ export default function ProductsPage() {
           {categoryTitles[selectedCategory] || "Hardware Catalog"}
         </h1>
         <p className="text-xs sm:text-sm text-zinc-400 font-mono mt-1">
-          Showing {filteredProducts.length} verified devices with instant courier fulfillment.
+          {isLoading
+            ? "Connecting to live hardware database..."
+            : `Showing ${filteredProducts.length} of ${totalProductsCount} verified devices with instant courier fulfillment.`}
         </p>
       </div>
 
@@ -58,19 +73,48 @@ export default function ProductsPage() {
             </div>
           ))}
         </div>
-      ) : error ? (
-        <div className="p-12 text-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-300">
-          <p className="font-bold">Error loading catalog: {error}</p>
+      ) : error && totalProductsCount === 0 ? (
+        <div className="p-12 text-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-300 space-y-4">
+          <p className="font-bold text-lg">Unable to load catalog: {error}</p>
+          <button
+            onClick={() => dispatch(getProducts())}
+            className="px-5 py-2.5 rounded-xl bg-[#00f59b] hover:bg-emerald-400 text-black font-mono font-bold text-xs uppercase transition-all cursor-pointer"
+          >
+            Retry Loading Catalog
+          </button>
+        </div>
+      ) : totalProductsCount === 0 ? (
+        <div className="text-center py-20 space-y-4 rounded-3xl bg-white/[0.02] border border-white/[0.06]">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-white/[0.04] flex items-center justify-center text-zinc-500">
+            <Cpu className="w-8 h-8" />
+          </div>
+          <h3 className="text-xl font-bold text-white">No hardware in inventory</h3>
+          <p className="text-xs text-zinc-400 max-w-sm mx-auto">
+            Unable to fetch items from the supplier API.
+          </p>
+          <button
+            onClick={() => dispatch(getProducts())}
+            className="px-5 py-2.5 rounded-xl bg-[#00f59b] hover:bg-emerald-400 text-black font-mono font-bold text-xs uppercase transition-all cursor-pointer"
+          >
+            Reload Inventory
+          </button>
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="text-center py-20 space-y-4 rounded-3xl bg-white/[0.02] border border-white/[0.06]">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-white/[0.04] flex items-center justify-center text-zinc-500">
             <Cpu className="w-8 h-8" />
           </div>
-          <h3 className="text-xl font-bold text-white">No hardware found</h3>
+          <h3 className="text-xl font-bold text-white">No hardware matched your criteria</h3>
           <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-            Try adjusting your search criteria or resetting filters above.
+            No devices found matching your active filter criteria. Try adjusting your search or resetting filters.
           </p>
+          <button
+            onClick={() => dispatch(resetFilters())}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-white font-mono font-bold text-xs uppercase transition-colors cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Reset Filters</span>
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

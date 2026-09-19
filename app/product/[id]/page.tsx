@@ -22,7 +22,6 @@ import {
   ArrowLeft,
   Cpu,
   Check,
-  Share2,
 } from "lucide-react";
 
 export default function ProductDetailPage() {
@@ -182,7 +181,7 @@ export default function ProductDetailPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-[#00f59b] font-bold uppercase tracking-widest">
-                {product.brand} // {product.techCategory}
+                {`${product.brand} // ${product.techCategory}`}
               </span>
               <div className="flex items-center gap-1 text-amber-400">
                 <Star className="w-4 h-4 fill-amber-400" />

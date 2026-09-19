@@ -80,7 +80,7 @@ export default function CartPage() {
         <div className="space-y-2">
           <h1 className="text-3xl font-extrabold text-white">Your Cart is Empty</h1>
           <p className="text-sm text-zinc-400 max-w-md mx-auto">
-            You haven't added any flagship smartphones, laptops, or accessories yet.
+            You haven&apos;t added any flagship smartphones, laptops, or accessories yet.
           </p>
         </div>
         <Link
@@ -184,7 +184,7 @@ export default function CartPage() {
                   </div>
                   <div className="min-w-0">
                     <span className="text-[10px] font-mono text-[#00f59b] uppercase tracking-wider font-semibold">
-                      {product.brand} // {product.techCategory}
+                      {`${product.brand} // ${product.techCategory}`}
                     </span>
                     <Link
                       href={`/product/${product.id}`}
@@ -297,6 +297,10 @@ export default function CartPage() {
                   Apply
                 </button>
               </div>
+
+              {syncError && !discountCode && (
+                <p className="text-[11px] text-rose-400 font-mono">{syncError}</p>
+              )}
 
               {discountCode && (
                 <div className="flex items-center justify-between p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-mono text-emerald-400">

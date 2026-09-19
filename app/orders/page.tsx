@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/store";
 import { selectOrders } from "@/lib/redux/slices/ordersSlice";
-import { addToCart } from "@/lib/redux/slices/cartSlice";
 import { addToast } from "@/lib/redux/slices/uiSlice";
 import { formatPrice } from "@/lib/utils";
 import { OrderStatus } from "@/types/product";
@@ -16,8 +15,6 @@ import {
   CheckCircle2,
   Building2,
   ArrowRight,
-  ExternalLink,
-  RotateCcw,
   Copy,
   Search,
 } from "lucide-react";
@@ -133,7 +130,7 @@ export default function OrdersPage() {
           </div>
           <h3 className="text-xl font-bold text-white">No Orders Found</h3>
           <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-            You don't have any orders matching the current filter.
+            You don&apos;t have any orders matching the current filter.
           </p>
           <Link
             href="/products"

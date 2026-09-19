@@ -15,7 +15,7 @@ export interface ProductsState {
 
 const initialState: ProductsState = {
   items: [],
-  isLoading: false,
+  isLoading: true, // Start in loading state until catalog is loaded
   error: null,
   selectedCategory: "all",
   searchQuery: "",
@@ -31,8 +31,9 @@ export const getProducts = createAsyncThunk(
     try {
       const data = await fetchAllProducts();
       return data;
-    } catch (err: any) {
-      return rejectWithValue(err.message || "Failed to load products");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to load products";
+      return rejectWithValue(message);
     }
   }
 );
@@ -43,8 +44,9 @@ export const getSingleProduct = createAsyncThunk(
     try {
       const data = await fetchProductById(id);
       return data;
-    } catch (err: any) {
-      return rejectWithValue(err.message || "Failed to load product");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to load product";
+      return rejectWithValue(message);
     }
   }
 );
@@ -87,10 +89,11 @@ export const productsSlice = createSlice({
       .addCase(getProducts.fulfilled, (state, action) => {
         state.isLoading = false;
         state.items = action.payload;
+        state.error = null;
       })
       .addCase(getProducts.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.error = (action.payload as string) || "Failed to load products";
       })
       .addCase(getSingleProduct.fulfilled, (state, action) => {
         if (action.payload) {
@@ -108,6 +111,16 @@ export const {
   setActiveProduct,
   resetFilters,
 } = productsSlice.actions;
+
+// Selectors
+export const selectTotalProductsCount = (state: { products: ProductsState }) =>
+  state.products.items.length;
+
+export const selectProductsLoading = (state: { products: ProductsState }) =>
+  state.products.isLoading;
+
+export const selectProductsError = (state: { products: ProductsState }) =>
+  state.products.error;
 
 // Filtered and Sorted products selector
 export const selectFilteredProducts = (state: { products: ProductsState }) => {

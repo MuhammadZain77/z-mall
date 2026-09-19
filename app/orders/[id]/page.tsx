@@ -17,7 +17,6 @@ import {
   ShieldCheck,
   CreditCard,
   MapPin,
-  CheckCircle,
   Package,
 } from "lucide-react";
 
@@ -35,7 +34,7 @@ export default function OrderTrackingDetailPage() {
       <div className="max-w-3xl mx-auto px-4 py-24 text-center space-y-4">
         <h2 className="text-2xl font-bold text-white">Order Record Not Found</h2>
         <p className="text-sm text-zinc-400">
-          No order with ID "{orderId}" was found in your order log.
+          No order with ID &quot;{orderId}&quot; was found in your order log.
         </p>
         <Link
           href="/orders"

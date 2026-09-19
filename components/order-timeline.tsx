@@ -182,7 +182,7 @@ export default function OrderTimeline({
             onClick={handleAdvanceStatus}
             className="px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-[#00f59b] text-white hover:text-black border border-white/[0.1] hover:border-[#00f59b] text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
           >
-            <span>Advance to "{statuses[currentIndex + 1]}"</span>
+            <span>Advance to &quot;{statuses[currentIndex + 1]}&quot;</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>

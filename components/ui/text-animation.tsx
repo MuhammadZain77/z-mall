@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
@@ -117,16 +117,10 @@ export const TextAnimation: React.FC<TextAnimationProps> = ({
   const linesRef = useRef<HTMLElement[]>([]);
   const blocksRef = useRef<HTMLElement[]>([]);
   const hasPlayed = useRef(false);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    injectStyles();
-    setReady(true);
-  }, []);
-
   useGSAP(
     () => {
-      if (!ready || !containerRef.current) return;
+      injectStyles();
+      if (!containerRef.current) return;
       const container = containerRef.current;
 
       // Clean up previous elements
@@ -184,7 +178,7 @@ export const TextAnimation: React.FC<TextAnimationProps> = ({
     },
     {
       scope: containerRef,
-      dependencies: [ready, delay, blockColor, stagger, duration],
+      dependencies: [delay, blockColor, stagger, duration],
     }
   );
 

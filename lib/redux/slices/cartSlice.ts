@@ -24,7 +24,7 @@ const loadLocalCart = (): CartItem[] => {
   try {
     const saved = localStorage.getItem(CART_STORAGE_KEY);
     return saved ? JSON.parse(saved) : [];
-  } catch (e) {
+  } catch {
     return [];
   }
 };
@@ -59,7 +59,7 @@ const initialState: CartState = {
 // ─── Async: Load cart from Supabase (fallback to localStorage) ────
 export const loadCartFromDb = createAsyncThunk(
   "cart/loadFromDb",
-  async (_, { rejectWithValue }) => {
+  async () => {
     try {
       const sessionId = getSessionId();
       const supabaseCart = await loadCartFromSupabase(sessionId);
@@ -72,7 +72,7 @@ export const loadCartFromDb = createAsyncThunk(
         saveCartToSupabase(sessionId, localCart).catch(() => {});
       }
       return { items: localCart, sessionId };
-    } catch (err) {
+    } catch {
       console.warn("[Cart] Supabase unavailable, falling back to localStorage");
       const sessionId = getSessionId();
       return { items: loadLocalCart(), sessionId };
@@ -91,8 +91,9 @@ export const syncCartRemote = createAsyncThunk(
       }));
       const res = await syncCartWithFakeStore(1, payload);
       return res;
-    } catch (err: any) {
-      return rejectWithValue(err.message || "Failed to sync cart");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to sync cart";
+      return rejectWithValue(message);
     }
   }
 );

@@ -184,7 +184,7 @@ export default function Hero() {
                       Display
                     </p>
                     <p className="text-xs font-semibold text-white font-mono mt-0.5">
-                      6.8" 2K 144Hz AMOLED
+                      6.8&quot; 2K 144Hz AMOLED
                     </p>
                   </div>
                   <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">

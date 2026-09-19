@@ -557,14 +557,24 @@ export function enrichTechProduct(fakeProduct: FakeStoreProduct): Product {
  */
 export async function fetchAllProducts(): Promise<Product[]> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
     const res = await fetch(`${BASE_URL}/products`, {
-      next: { revalidate: 3600 },
+      signal: controller.signal,
+      headers: { Accept: "application/json" },
     });
-    if (!res.ok) throw new Error("Failed to fetch products from FakeStoreAPI");
-    const raw: FakeStoreProduct[] = await res.json();
-    return raw.map(enrichTechProduct);
-  } catch (err) {
-    console.error("FakeStoreAPI fetch failed, utilizing enriched tech cache:", err);
+    clearTimeout(timeoutId);
+
+    if (!res.ok) throw new Error(`FakeStoreAPI HTTP ${res.status}: ${res.statusText}`);
+    const raw: unknown = await res.json();
+    if (!Array.isArray(raw) || raw.length === 0) {
+      throw new Error("FakeStoreAPI returned empty or invalid products array");
+    }
+    return (raw as FakeStoreProduct[]).map(enrichTechProduct);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn("FakeStoreAPI fetch failed, utilizing enriched tech cache:", message);
     // Return all enriched tech products as resilient backup
     return Object.entries(TECH_METADATA).map(([idStr, meta]) => {
       const id = Number(idStr);
@@ -595,14 +605,20 @@ export async function fetchAllProducts(): Promise<Product[]> {
  */
 export async function fetchProductById(id: number): Promise<Product | null> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
     const res = await fetch(`${BASE_URL}/products/${id}`, {
-      next: { revalidate: 3600 },
+      signal: controller.signal,
+      headers: { Accept: "application/json" },
     });
+    clearTimeout(timeoutId);
+
     if (!res.ok) throw new Error(`Failed to fetch product ${id}`);
     const raw: FakeStoreProduct = await res.json();
     return enrichTechProduct(raw);
-  } catch (err) {
-    console.error(`FakeStoreAPI fetch for ${id} failed:`, err);
+  } catch (err: unknown) {
+    console.warn(`FakeStoreAPI fetch for ${id} failed:`, err);
     const meta = TECH_METADATA[id];
     if (meta) {
       return {
@@ -656,7 +672,9 @@ export async function syncCartWithFakeStore(
 /**
  * Submit order to FakeStoreAPI (simulates order persistence with remote endpoint)
  */
-export async function submitOrderToFakeStore(orderPayload: any) {
+export async function submitOrderToFakeStore(orderPayload: {
+  items: Array<{ productId: number; quantity: number }>;
+}) {
   try {
     const res = await fetch(`${BASE_URL}/carts`, {
       method: "POST",
@@ -664,7 +682,7 @@ export async function submitOrderToFakeStore(orderPayload: any) {
       body: JSON.stringify({
         userId: 1,
         date: new Date().toISOString().split("T")[0],
-        products: orderPayload.items.map((i: any) => ({
+        products: orderPayload.items.map((i) => ({
           productId: i.productId,
           quantity: i.quantity,
         })),
@@ -677,3 +695,4 @@ export async function submitOrderToFakeStore(orderPayload: any) {
     return { success: true, fakeStoreId: Math.floor(Math.random() * 9000) + 1000 };
   }
 }
+

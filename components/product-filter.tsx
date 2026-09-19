@@ -132,7 +132,17 @@ export default function ProductFilter() {
             </div>
             <select
               value={sortBy}
-              onChange={(e) => dispatch(setSortBy(e.target.value as any))}
+              onChange={(e) =>
+                dispatch(
+                  setSortBy(
+                    e.target.value as
+                      | "featured"
+                      | "price-asc"
+                      | "price-desc"
+                      | "rating"
+                  )
+                )
+              }
               className="py-2 px-3 text-xs font-mono rounded-xl bg-white/[0.04] border border-white/[0.1] text-white focus:outline-none focus:border-[#00f59b] cursor-pointer"
             >
               <option value="featured" className="bg-[#0b0c12] text-white">

@@ -170,7 +170,7 @@ const loadSavedOrders = (): Order[] => {
       return parsed.length > 0 ? parsed : DEMO_ORDERS;
     }
     return DEMO_ORDERS;
-  } catch (e) {
+  } catch {
     return DEMO_ORDERS;
   }
 };
@@ -179,8 +179,8 @@ const saveOrdersToStorage = (orders: Order[]) => {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(orders));
-  } catch (e) {
-    console.error("Failed to save orders to localStorage", e);
+  } catch {
+    console.error("Failed to save orders to localStorage");
   }
 };
 
@@ -196,7 +196,7 @@ const initialState: OrdersState = {
 // ─── Async: Load orders from Supabase (fallback to localStorage) ────
 export const loadOrdersFromSupabase = createAsyncThunk(
   "orders/loadFromSupabase",
-  async (_, { rejectWithValue }) => {
+  async () => {
     try {
       const supabaseOrders = await fetchAllOrders();
       if (supabaseOrders.length > 0) {
@@ -234,8 +234,9 @@ export const placeOrder = createAsyncThunk(
       });
 
       return fullOrder;
-    } catch (err: any) {
-      return rejectWithValue(err.message || "Failed to place order");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to place order";
+      return rejectWithValue(message);
     }
   }
 );
@@ -275,8 +276,9 @@ export const advanceOrderStatus = createAsyncThunk(
       });
 
       return { orderId, newStatus, updatedTimeline };
-    } catch (err: any) {
-      return rejectWithValue(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to update status";
+      return rejectWithValue(message);
     }
   }
 );
